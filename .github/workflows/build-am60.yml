@@ -22,9 +22,10 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "s912-x92_s922x_s922x-ct2000_s922x-reva_seewo-sv21_smart-am40_smart-am60_station-m1_sw799_swan1-w28"
+        default: "smart-am60"
         type: choice
         options:
+          - smart-am60
           - s912-x92_s922x_s922x-ct2000_s922x-reva_seewo-sv21_smart-am40_smart-am60_station-m1_sw799_swan1-w28
           - eaidk-610
           - fine3399
@@ -242,6 +243,7 @@ jobs:
         uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
         with:
+          # call action.yml in ophub/amlogic-s9xxx-armbian@main
           build_target: armbian
           armbian_path: build/output/images/*.img.gz
           armbian_board: ${{ inputs.armbian_board }}
