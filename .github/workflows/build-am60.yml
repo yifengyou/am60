@@ -140,7 +140,15 @@ jobs:
           tag: "workflow_envinfo"
           artifacts: envinfo.txt
           allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ### Github Workflow environment info gather
+            - cpuinfo
+            - disk info
+            - memory info
+            - os release info
 
       - name: Initialization environment
         id: init
