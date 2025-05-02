@@ -127,6 +127,17 @@ jobs:
           else
             echo "GITHUB_TOKEN already set."
           fi
+          mkdir -p build/output/images/
+          touch ok build/output/images/ok.txt
+
+      - name: test GITHUB_TOKEN
+        uses: ncipollo/release-action@main
+        if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
+        with:
+          tag: ${{ steps.clean.outputs.build_tag }}
+          artifacts: build/output/images/*
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Initialization environment
         id: init
