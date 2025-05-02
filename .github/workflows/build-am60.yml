@@ -22,24 +22,16 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "all"
+        default: "s912-x92_s922x_s922x-ct2000_s922x-reva_seewo-sv21_smart-am40_smart-am60_station-m1_sw799_swan1-w28"
         type: choice
         options:
-          - all
           - s912-x92_s922x_s922x-ct2000_s922x-reva_seewo-sv21_smart-am40_smart-am60_station-m1_sw799_swan1-w28
-          - dg3399
-          - dg-tn3568
           - eaidk-610
           - fine3399
           - firefly-rk3399
           - fmx1-pro
-          - h28k
-          - h66k
-          - h68k
-          - h69k
           - h88k
           - h88k-v3
-          - h96-max-m2
           - king3399
           - kylin3399
           - nanopc-t6
@@ -48,10 +40,7 @@ on:
           - orangepi-5-plus
           - rock5b
           - rock5c
-          - sw799
-          - tb-ls3399
           - tn3399
-          - tpm312
       armbian_kernel:
         description: "Select kernel version."
         required: false
@@ -196,10 +185,11 @@ jobs:
         id: clean
         if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         run: |
+          git clone -q --single-branch --depth=1 --branch=main https://github.com/ophub/amlogic-s9xxx-armbian.git amlogic-s9xxx-armbian.git
+          cp -a amlogic-s9xxx-armbian.git/compile-kernel .
           # Organize and keep essential files, delete unnecessary files
           chmod +x ${ROOTFS_SCRIPT}
           ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }}
-
           # Output cleaning result information
           df -hT ${PWD}
           echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
