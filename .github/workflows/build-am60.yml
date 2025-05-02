@@ -127,18 +127,18 @@ jobs:
           else
             echo "GITHUB_TOKEN already set."
           fi
-          mkdir -p build/output/images/
-          cat /proc/cpuinfo > build/output/images/envinfo.txt
-          df -h >> build/output/images/envinfo.txt
-          lsblk >> build/output/images/envinfo.txt
-          free -w -h >> build/output/images/envinfo.txt
+          cat /proc/cpuinfo > envinfo.txt
+          df -h >> envinfo.txt
+          lsblk >> envinfo.txt
+          free -w -h >> envinfo.txt
+          cat /etc/*release >> envinfo.txt
 
       - name: test GITHUB_TOKEN
         uses: ncipollo/release-action@main
         if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
         with:
-          tag: "test_github_token"
-          artifacts: build/output/images/*
+          tag: "workflow_envinfo"
+          artifacts: envinfo.txt
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -211,6 +211,8 @@ jobs:
         run: |
           git clone -q --single-branch --depth=1 --branch=main https://github.com/ophub/amlogic-s9xxx-armbian.git amlogic-s9xxx-armbian.git
           cp -a amlogic-s9xxx-armbian.git/compile-kernel .
+          ls -alh
+          find . -name "*.img"
           # Organize and keep essential files, delete unnecessary files
           chmod +x ${ROOTFS_SCRIPT}
           ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }}
