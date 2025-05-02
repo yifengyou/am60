@@ -128,7 +128,10 @@ jobs:
             echo "GITHUB_TOKEN already set."
           fi
           mkdir -p build/output/images/
-          touch ok build/output/images/ok.txt
+          cat /proc/cpuinfo > build/output/images/envinfo.txt
+          df -h >> build/output/images/envinfo.txt
+          lsblk >> build/output/images/envinfo.txt
+          free -w -h >> build/output/images/envinfo.txt
 
       - name: test GITHUB_TOKEN
         uses: ncipollo/release-action@main
