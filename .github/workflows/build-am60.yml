@@ -3,7 +3,7 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Build armbian
+name: Build Smart-Am60 armbian
 
 on:
   repository_dispatch:
