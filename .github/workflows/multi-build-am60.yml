@@ -144,6 +144,7 @@ jobs:
         uses: ncipollo/release-action@main
         if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
         with:
+          max_attempts: 3
           tag: "workflow_envinfo"
           artifacts: envinfo.txt
           allowUpdates: true
@@ -156,8 +157,6 @@ jobs:
             - disk info
             - memory info
             - os release info
-      retries: 6
-      retry-delay-minutes: 1
 
       - name: Initialization environment
         id: init
