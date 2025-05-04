@@ -1,6 +1,6 @@
 #==========================================================================
-# Description: Build Armbian
-# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+# Description: Build am60 Armbian
+# Copyright (C) 2025 https://github.com/yifengyou/am60
 #==========================================================================
 
 name: Autobuild Smart-Am60 armbian
@@ -143,7 +143,6 @@ jobs:
         if: github.event_name != 'workflow_dispatch'
         run: |
           echo "Setting default env for auto trigger"
-          echo "set_release=bullseye" >> $GITHUB_ENV
           echo "armbian_board=smart-am60" >> $GITHUB_ENV
           echo "armbian_kernel=6.1.y_6.12.y" >> $GITHUB_ENV
           echo "auto_kernel=true" >> $GITHUB_ENV
@@ -217,14 +216,14 @@ jobs:
           ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile Armbian [ ${{ env.set_release }} ]
+      - name: Compile Armbian [ ${{ matrix.set_release }} ]
         id: compile
         working-directory: /builder
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
-              ./compile.sh RELEASE=${{ env.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
+              ./compile.sh RELEASE=${{ matrix.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
                            BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
                            COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
           echo "status=success" >> ${GITHUB_OUTPUT}
@@ -239,10 +238,10 @@ jobs:
           find . -name "*.img"
           # Organize and keep essential files, delete unnecessary files
           chmod +x ${ROOTFS_SCRIPT}
-          ${ROOTFS_SCRIPT} -v ${{ env.set_release }}
+          ${ROOTFS_SCRIPT} -v ${{ matrix.set_release }}
           # Output cleaning result information
           df -hT ${PWD}
-          echo "build_tag=Armbian_${{ matrix.set_release }}_${{ env.set_release }}" >> ${GITHUB_OUTPUT}
+          echo "build_tag=Armbian_${{ env.armbian_board }}_${{ matrix.set_release }}" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Armbian image to Release
