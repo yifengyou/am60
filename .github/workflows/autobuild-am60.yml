@@ -242,7 +242,7 @@ jobs:
           ${ROOTFS_SCRIPT} -v ${{ env.set_release }}
           # Output cleaning result information
           df -hT ${PWD}
-          echo "build_tag=Armbian_${{ env.set_release }}_${{ env.armbian_storage }}_$(date +"%Y.%m.%d_%H%M%S")" >> ${GITHUB_OUTPUT}
+          echo "build_tag=Armbian_${{ matrix.set_release }}_${{ env.set_release }}" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Armbian image to Release
