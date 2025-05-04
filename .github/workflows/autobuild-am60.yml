@@ -144,13 +144,13 @@ jobs:
         run: |
           echo "Setting default env for auto trigger"
           echo "set_release=bullseye" >> $GITHUB_ENV
-          echo "armanian_board=smart-am60" >> $GITHUB_ENV
-          echo "armanian_kernel=6.1.y_6.12.y" >> $GITHUB_ENV
+          echo "armbian_board=smart-am60" >> $GITHUB_ENV
+          echo "armbian_kernel=6.1.y_6.12.y" >> $GITHUB_ENV
           echo "auto_kernel=true" >> $GITHUB_ENV
           echo "kernel_repo=ophub/kernel" >> $GITHUB_ENV
           echo "kernel_usage=stable" >> $GITHUB_ENV
-          echo "armanian_fstype=ext4" >> $GITHUB_ENV
-          echo "armanian_storage=save" >> $GITHUB_ENV
+          echo "armbian_fstype=ext4" >> $GITHUB_ENV
+          echo "armbian_storage=save" >> $GITHUB_ENV
           echo "builder_name=ophub" >> $GITHUB_ENV
 
       - name: Display Inputs
