@@ -10,7 +10,7 @@ on:
     branches:
       - master            # 只在 master 分支触发
   schedule:               # 定时触发
-    - cron: '0 6 * * *'   # 每天零点触发
+    - cron: '0 7 * * *'   # 每天零点触发
   repository_dispatch:
   workflow_dispatch:
     inputs:
@@ -163,6 +163,7 @@ jobs:
           echo "Armbian FSType: ${{ env.armbian_fstype }}"
           echo "Armbian Storage: ${{ env.armbian_storage }}"
           echo "Builder Name: ${{ env.builder_name }}"
+          echo "Build tag: Armbian_${{ env.armbian_board }}_${{ matrix.set_release }}"
 
 
       - name: Initialization environment
