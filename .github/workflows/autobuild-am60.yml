@@ -143,15 +143,15 @@ jobs:
         if: github.event_name != 'workflow_dispatch'
         run: |
           echo "Setting default env for auto trigger"
-          echo "SET_RELEASE=bullseye" >> $GITHUB_ENV
-          echo "ARMANIAN_BOARD=smart-am60" >> $GITHUB_ENV
-          echo "ARMANIAN_KERNEL=6.1.y_6.12.y" >> $GITHUB_ENV
-          echo "AUTO_KERNEL=true" >> $GITHUB_ENV
-          echo "KERNEL_REPO=ophub/kernel" >> $GITHUB_ENV
-          echo "KERNEL_USAGE=stable" >> $GITHUB_ENV
-          echo "ARMANIAN_FSTYPE=ext4" >> $GITHUB_ENV
-          echo "ARMANIAN_STORAGE=save" >> $GITHUB_ENV
-          echo "BUILDER_NAME=ophub" >> $GITHUB_ENV
+          echo "set_release=bullseye" >> $GITHUB_ENV
+          echo "armanian_board=smart-am60" >> $GITHUB_ENV
+          echo "armanian_kernel=6.1.y_6.12.y" >> $GITHUB_ENV
+          echo "auto_kernel=true" >> $GITHUB_ENV
+          echo "kernel_repo=ophub/kernel" >> $GITHUB_ENV
+          echo "kernel_usage=stable" >> $GITHUB_ENV
+          echo "armanian_fstype=ext4" >> $GITHUB_ENV
+          echo "armanian_storage=save" >> $GITHUB_ENV
+          echo "builder_name=ophub" >> $GITHUB_ENV
 
       - name: Display Inputs
         run: |
