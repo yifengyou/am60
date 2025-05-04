@@ -3,12 +3,27 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Multibuild Smart-Am60 armbian
+name: Autobuild Smart-Am60 armbian
 
 on:
+  push:                   # 推送时触发
+    branches:
+      - master            # 只在 master 分支触发
+  schedule:               # 定时触发
+    - cron: '0 6 * * *'   # 每天零点触发
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      set_release:
+        description: "Select OS Release."
+        required: false
+        default: "bullseye"
+        type: choice
+        options:
+          - bullseye
+          - jammy
+          - noble
+          - bookworm
       armbian_board:
         description: "Select device board."
         required: false
@@ -110,8 +125,6 @@ jobs:
         set_release:
           - bookworm
           - bullseye
-          - buster
-          - focal
           - jammy
           - noble
           - oracular
@@ -119,43 +132,39 @@ jobs:
           - sid
           - trixie
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 10
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: check GITHUB_TOKEN
-        id: check_token
+        # 如果是自动触发，env 可能为空，因此需要使用默认值
+      - name: Configure Inputs for Auto Trigger
+        if: github.event_name != 'workflow_dispatch'
         run: |
-          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
-            echo "GITHUB_TOKEN not set, abort"
-            exit 1
-          else
-            echo "GITHUB_TOKEN already set."
-          fi
-          cat /proc/cpuinfo > envinfo.txt
-          df -h >> envinfo.txt
-          lsblk >> envinfo.txt
-          free -w -h >> envinfo.txt
-          cat /etc/*release >> envinfo.txt
+          echo "Setting default env for auto trigger"
+          echo "SET_RELEASE=bullseye" >> $GITHUB_ENV
+          echo "ARMANIAN_BOARD=smart-am60" >> $GITHUB_ENV
+          echo "ARMANIAN_KERNEL=6.1.y_6.12.y" >> $GITHUB_ENV
+          echo "AUTO_KERNEL=true" >> $GITHUB_ENV
+          echo "KERNEL_REPO=ophub/kernel" >> $GITHUB_ENV
+          echo "KERNEL_USAGE=stable" >> $GITHUB_ENV
+          echo "ARMANIAN_FSTYPE=ext4" >> $GITHUB_ENV
+          echo "ARMANIAN_STORAGE=save" >> $GITHUB_ENV
+          echo "BUILDER_NAME=ophub" >> $GITHUB_ENV
 
-      - name: test GITHUB_TOKEN
-        uses: ncipollo/release-action@main
-        if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
-        with:
-          tag: "workflow_envinfo"
-          artifacts: envinfo.txt
-          allowUpdates: true
-          removeArtifacts: false
-          replacesArtifacts: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            ### Github Workflow environment info gather
-            - cpuinfo
-            - disk info
-            - memory info
-            - os release info
+      - name: Display Inputs
+        run: |
+          echo "Set Release: ${{ matrix.set_release }}"
+          echo "Armbian Board: ${{ github.event.env.armbian_board }}"
+          echo "Armbian Kernel: ${{ github.event.env.armbian_kernel }}"
+          echo "Auto Kernel: ${{ github.event.env.auto_kernel }}"
+          echo "Kernel Repo: ${{ github.event.env.kernel_repo }}"
+          echo "Kernel Usage: ${{ github.event.env.kernel_usage }}"
+          echo "Armbian FSType: ${{ github.event.env.armbian_fstype }}"
+          echo "Armbian Storage: ${{ github.event.env.armbian_storage }}"
+          echo "Builder Name: ${{ github.event.env.builder_name }}"
+
 
       - name: Initialization environment
         id: init
@@ -208,14 +217,14 @@ jobs:
           ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile Armbian [ ${{ matrix.set_release }} ]
+      - name: Compile Armbian [ ${{ env.set_release }} ]
         id: compile
         working-directory: /builder
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
-              ./compile.sh RELEASE=${{ matrix.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
+              ./compile.sh RELEASE=${{ env.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
                            BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
                            COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
           echo "status=success" >> ${GITHUB_OUTPUT}
@@ -230,10 +239,10 @@ jobs:
           find . -name "*.img"
           # Organize and keep essential files, delete unnecessary files
           chmod +x ${ROOTFS_SCRIPT}
-          ${ROOTFS_SCRIPT} -v ${{ matrix.set_release }}
+          ${ROOTFS_SCRIPT} -v ${{ env.set_release }}
           # Output cleaning result information
           df -hT ${PWD}
-          echo "build_tag=Armbian_${{ matrix.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m.%d_%H%M%S")" >> ${GITHUB_OUTPUT}
+          echo "build_tag=Armbian_${{ env.set_release }}_${{ env.armbian_storage }}_$(date +"%Y.%m.%d_%H%M%S")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Armbian image to Release
@@ -252,13 +261,13 @@ jobs:
           # call action.yml in ophub/amlogic-s9xxx-armbian@main
           build_target: armbian
           armbian_path: build/output/images/*.img.gz
-          armbian_board: ${{ inputs.armbian_board }}
-          armbian_kernel: ${{ inputs.armbian_kernel }}
-          auto_kernel: ${{ inputs.auto_kernel }}
-          kernel_repo: ${{ inputs.kernel_repo }}
-          kernel_usage: ${{ inputs.kernel_usage }}
-          armbian_fstype: ${{ inputs.armbian_fstype }}
-          builder_name: ${{ inputs.builder_name }}
+          armbian_board: ${{ env.armbian_board }}
+          armbian_kernel: ${{ env.armbian_kernel }}
+          auto_kernel: ${{ env.auto_kernel }}
+          kernel_repo: ${{ env.kernel_repo }}
+          kernel_usage: ${{ env.kernel_usage }}
+          armbian_fstype: ${{ env.armbian_fstype }}
+          builder_name: ${{ env.builder_name }}
 
       - name: Upload Rebuild image to Release
         uses: ncipollo/release-action@main
