@@ -156,14 +156,14 @@ jobs:
       - name: Display Inputs
         run: |
           echo "Set Release: ${{ matrix.set_release }}"
-          echo "Armbian Board: ${{ github.event.env.armbian_board }}"
-          echo "Armbian Kernel: ${{ github.event.env.armbian_kernel }}"
-          echo "Auto Kernel: ${{ github.event.env.auto_kernel }}"
-          echo "Kernel Repo: ${{ github.event.env.kernel_repo }}"
-          echo "Kernel Usage: ${{ github.event.env.kernel_usage }}"
-          echo "Armbian FSType: ${{ github.event.env.armbian_fstype }}"
-          echo "Armbian Storage: ${{ github.event.env.armbian_storage }}"
-          echo "Builder Name: ${{ github.event.env.builder_name }}"
+          echo "Armbian Board: ${{ env.armbian_board }}"
+          echo "Armbian Kernel: ${{ env.armbian_kernel }}"
+          echo "Auto Kernel: ${{ env.auto_kernel }}"
+          echo "Kernel Repo: ${{ env.kernel_repo }}"
+          echo "Kernel Usage: ${{ env.kernel_usage }}"
+          echo "Armbian FSType: ${{ env.armbian_fstype }}"
+          echo "Armbian Storage: ${{ env.armbian_storage }}"
+          echo "Builder Name: ${{ env.builder_name }}"
 
 
       - name: Initialization environment
